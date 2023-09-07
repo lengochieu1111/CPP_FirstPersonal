@@ -9,8 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 
-class UInputMappingContext;
-class UInputAction;
+class UEnhancedInputData;
 struct FInputActionValue;
 
 UCLASS()
@@ -30,8 +29,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void AddMappingContextForCharacter();
+
 private:
 	void Look(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
 
 /* PROPERTY */
 private:
@@ -41,11 +43,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	UInputMappingContext* InputMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
-	UInputAction* IA_Look;
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input Data")
+	UEnhancedInputData* EnhancedInputData;
 
 
 };

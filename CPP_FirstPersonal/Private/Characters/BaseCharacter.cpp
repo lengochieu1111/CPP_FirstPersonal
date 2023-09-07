@@ -2,11 +2,15 @@
 
 #include "Characters/BaseCharacter.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+
+#include "DataAsset/EnhancedInputData.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -27,21 +31,8 @@ ABaseCharacter::ABaseCharacter()
 
 	//
 	bUseControllerRotationYaw = false;
-
-}
-
-void ABaseCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	/* Add Mapping Context */
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-
-	if (PlayerController == nullptr)  return;
-	auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-
-	if (Subsystem == nullptr || this->InputMappingContext == nullptr) return;
-	Subsystem->AddMappingContext(this->InputMappingContext, 0);
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0, 0.0, 540.0);
 
 }
 
@@ -49,12 +40,36 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	AddMappingContextForCharacter();
+
 	/* Handle Input Action Look */
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
-	if (EnhancedInputComponent)
-		EnhancedInputComponent->BindAction(this->IA_Look, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
+	if (EnhancedInputComponent && this->EnhancedInputData && this->EnhancedInputData->IA_Look && this->EnhancedInputData->IA_Move)
+	{
+		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Look, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
+		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Move, ETriggerEvent::Triggered, this, &ABaseCharacter::Move);
+	}
 
+
+}
+
+void ABaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void ABaseCharacter::AddMappingContextForCharacter()
+{
+	/* Add Mapping Context */
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if (PlayerController == nullptr)  return;
+	auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+
+	if (Subsystem && this->EnhancedInputData && this->EnhancedInputData->InputMappingContext)
+		Subsystem->AddMappingContext(this->EnhancedInputData->InputMappingContext, 0);
 }
 
 void ABaseCharacter::Look(const FInputActionValue& Value)
@@ -66,6 +81,24 @@ void ABaseCharacter::Look(const FInputActionValue& Value)
 	
 	if (LookValue.Y != 0)
 		AddControllerPitchInput(LookValue.Y);
+
+}
+
+void ABaseCharacter::Move(const FInputActionValue& Value)
+{
+	const FVector2D MoveValue = Value.Get<FVector2D>();
+
+	FRotator MyControllerRotation = FRotator(0.0, GetControlRotation().Yaw, 0.0);
+
+	FVector ForwardDirection = MyControllerRotation.RotateVector(FVector::ForwardVector);
+
+	FVector RightDirection = MyControllerRotation.RotateVector(FVector::RightVector);
+
+	if (MoveValue.X != 0)
+		AddMovementInput(RightDirection, MoveValue.X);
+
+	if (MoveValue.Y != 0)
+		AddMovementInput(ForwardDirection, MoveValue.Y);
 
 }
 
