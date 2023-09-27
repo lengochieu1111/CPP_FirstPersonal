@@ -7,6 +7,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
+#include "Component/AttackComponent.h"
+
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
@@ -24,10 +26,13 @@ ABaseCharacter::ABaseCharacter()
 	this->SpringArmComponent->TargetArmLength = 400.f;
 	this->SpringArmComponent->AddLocalOffset(FVector(0.0f, 0.0f, 40.0f));
 
-	/* Caamera Component */
+	/* Camera Component */
 	this->CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	this->CameraComponent->SetupAttachment(this->SpringArmComponent);
 	this->CameraComponent->bUsePawnControlRotation = false;
+
+	/* Attack Component */
+	this->AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("Attack Component"));
 
 	//
 	bUseControllerRotationYaw = false;
@@ -49,6 +54,7 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Look, ETriggerEvent::Triggered, this, &ABaseCharacter::Look);
 		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Move, ETriggerEvent::Triggered, this, &ABaseCharacter::Move);
+		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Attack, ETriggerEvent::Started, this, &ABaseCharacter::AttackPressed);
 	}
 
 
@@ -100,5 +106,11 @@ void ABaseCharacter::Move(const FInputActionValue& Value)
 	if (MoveValue.Y != 0)
 		AddMovementInput(ForwardDirection, MoveValue.Y);
 
+}
+
+void ABaseCharacter::AttackPressed()
+{
+	if (this->AttackComponent)
+		this->AttackComponent->RequestAttack(this);
 }
 

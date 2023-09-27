@@ -9,6 +9,8 @@
 class USpringArmComponent;
 class UCameraComponent;
 
+class UAttackComponent;
+
 class UEnhancedInputData;
 struct FInputActionValue;
 
@@ -34,6 +36,7 @@ protected:
 private:
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	void AttackPressed();
 
 /* PROPERTY */
 private:
@@ -43,8 +46,12 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	UAttackComponent* AttackComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input Data")
 	UEnhancedInputData* EnhancedInputData;
+
 
 
 };
