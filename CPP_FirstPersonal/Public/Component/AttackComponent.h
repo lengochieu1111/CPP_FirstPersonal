@@ -7,6 +7,8 @@
 
 
 class UAnimMontage;
+class UBaseCharacterData;
+class IAttackInterface;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CPP_FIRSTPERSONAL_API UAttackComponent : public UActorComponent
@@ -14,17 +16,25 @@ class CPP_FIRSTPERSONAL_API UAttackComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	UAttackComponent();
-
 	// virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	void RequestAttack(ACharacter* Character);
+	UAttackComponent();
+	void SetupAttackComponent(UBaseCharacterData* CharacterData);
+	void RequestAttack();
+	void AN_EndAttack();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	UAnimMontage* AttackMontage;
+	void Attack();
+
+private:
+	UPROPERTY()
+	TScriptInterface<IAttackInterface> AttackInterface;
+
+	UPROPERTY()
+	UBaseCharacterData* BaseCharacterData;
+
+	bool bIsAttacking = false;
 		
 };

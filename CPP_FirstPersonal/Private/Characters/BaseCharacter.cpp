@@ -60,6 +60,14 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ABaseCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (this->AttackComponent && this->BaseCharacterData)
+		this->AttackComponent->SetupAttackComponent(this->BaseCharacterData);
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -111,6 +119,16 @@ void ABaseCharacter::Move(const FInputActionValue& Value)
 void ABaseCharacter::AttackPressed()
 {
 	if (this->AttackComponent)
-		this->AttackComponent->RequestAttack(this);
+		this->AttackComponent->RequestAttack();
+}
+
+void ABaseCharacter::I_PlayAnimMontage(UAnimMontage* AttackMontage)
+{
+	PlayAnimMontage(AttackMontage);
+}
+
+void ABaseCharacter::I_AN_EndAttack()
+{
+	this->AttackComponent->AN_EndAttack();
 }
 
