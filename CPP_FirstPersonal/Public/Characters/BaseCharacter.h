@@ -6,6 +6,7 @@
 #include "Interface/AttackInterface.h"
 #include "BaseCharacter.generated.h"
 
+
 /* Class Declaration */
 class USpringArmComponent;
 class UCameraComponent;
@@ -27,7 +28,7 @@ public:
 	ABaseCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
-	// virtual void Tick(float DeltaTime) override;
+	 virtual void Tick(float DeltaTime) override;
 
 #pragma region Attack_Interface
 	virtual void I_PlayAnimMontage(UAnimMontage* AttackMontage) override;
@@ -64,5 +65,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Base Character Data")
 	UBaseCharacterData* BaseCharacterData;
 
+	/* Trace Hit */
 
+	TArray< AActor* > HittedActors;
 };

@@ -3,21 +3,23 @@
 #include "Characters/BaseCharacter.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-
-#include "Component/AttackComponent.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+
+#include "DataAsset/BaseCharacterData.h"
 #include "DataAsset/EnhancedInputData.h"
+
+#include "Component/AttackComponent.h"
 
 
 ABaseCharacter::ABaseCharacter()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	/* Sprint Arm Component */
 	this->SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
@@ -66,6 +68,66 @@ void ABaseCharacter::PostInitializeComponents()
 
 	if (this->AttackComponent && this->BaseCharacterData)
 		this->AttackComponent->SetupAttackComponent(this->BaseCharacterData);
+}
+
+void ABaseCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (this->BaseCharacterData == nullptr) return;
+
+	FVector TraceStart = GetMesh()->GetSocketLocation(this->BaseCharacterData->TraceStart);
+	FVector TraceEnd = GetMesh()->GetSocketLocation(this->BaseCharacterData->TraceEnd);
+
+	TArray<FHitResult> HitResults;
+	int HitCount = 0;
+
+	this->HittedActors.Empty();
+
+	bool bDoHitSomeThing = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		this,
+		TraceStart,
+		TraceEnd,
+		this->BaseCharacterData->TraceRadius,
+		this->BaseCharacterData->TraceObjectTypes,
+		false,
+		this->BaseCharacterData->ActorsToIgnore,
+		EDrawDebugTrace::ForDuration,
+		HitResults,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		this->BaseCharacterData->DrawTime
+	);
+
+	if (bDoHitSomeThing == false) return;
+
+	for (const FHitResult& Result : HitResults)
+	{
+		if (this->HittedActors.Contains(Result.GetActor())) continue;
+
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				1.0f,
+				FColor::Red,
+				Result.BoneName.ToString()
+			);
+
+		HitCount++;
+		this->HittedActors.Emplace(Result.GetActor());
+	}
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Cyan,
+			FString::Printf(TEXT("Hit Count = %d"), HitCount)
+		);
+
+
+
 }
 
 void ABaseCharacter::BeginPlay()
