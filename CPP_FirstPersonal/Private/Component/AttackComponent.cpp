@@ -6,6 +6,9 @@
 #include "DataAsset/BaseCharacterData.h"
 #include "Interface/AttackInterface.h"
 
+#include "Kismet/KismetSystemLibrary.h"
+
+
 UAttackComponent::UAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -31,11 +34,6 @@ void UAttackComponent::RequestAttack()
 	Attack();
 }
 
-void UAttackComponent::AN_EndAttack()
-{
-	this->bIsAttacking = false;
-}
-
 void UAttackComponent::Attack()
 {
 	if (this->AttackInterface && this->BaseCharacterData)
@@ -43,6 +41,73 @@ void UAttackComponent::Attack()
 
 	this->bIsAttacking = true;
 }
+
+void UAttackComponent::AN_EndAttack()
+{
+	this->bIsAttacking = false;
+}
+
+void UAttackComponent::SetupTraceHit()
+{
+	this->HitCount = 0;
+	this->HittedActors.Empty();
+}
+
+void UAttackComponent::TraceHit()
+{
+	if (this->BaseCharacterData == nullptr) return;
+	if (this->AttackInterface == nullptr) return;
+
+	FVector TraceStart = this->AttackInterface->I_GetSocketLocation(this->BaseCharacterData->TraceStart);
+	FVector TraceEnd = this->AttackInterface->I_GetSocketLocation(this->BaseCharacterData->TraceEnd);
+
+	TArray<FHitResult> HitResults;
+
+	bool bDoHitSomeThing = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		this,
+		TraceStart,
+		TraceEnd,
+		this->BaseCharacterData->TraceRadius,
+		this->BaseCharacterData->TraceObjectTypes,
+		false,
+		this->BaseCharacterData->ActorsToIgnore,
+		EDrawDebugTrace::ForDuration,
+		HitResults,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		this->BaseCharacterData->DrawTime
+	);
+
+	if (bDoHitSomeThing == false) return;
+
+	for (const FHitResult& Result : HitResults)
+	{
+		if (this->HittedActors.Contains(Result.GetActor())) continue;
+
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(
+				-1,
+				1.0f,
+				FColor::Red,
+				Result.BoneName.ToString()
+			);
+
+		this->HitCount++;
+		this->HittedActors.Emplace(Result.GetActor());
+	}
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Cyan,
+			FString::Printf(TEXT("Hit Count = %d"), HitCount)
+		);
+
+}
+
+
 
 
 

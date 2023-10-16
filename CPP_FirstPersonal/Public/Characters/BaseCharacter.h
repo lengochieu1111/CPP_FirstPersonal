@@ -28,19 +28,20 @@ public:
 	ABaseCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
-	 virtual void Tick(float DeltaTime) override;
+	//virtual void Tick(float DeltaTime) override;
 
-#pragma region Attack_Interface
+		#pragma region Attack_Interface
+
 	virtual void I_PlayAnimMontage(UAnimMontage* AttackMontage) override;
 	virtual void I_AN_EndAttack() override;
+	virtual FVector I_GetSocketLocation(const FName& SocketName) override;
+	virtual void I_ANS_BeginTraceHit() override;
+	virtual void I_ANS_TraceHit() override;
 
-#pragma endregion
-
-
+		#pragma endregion
 
 protected:
 	virtual void BeginPlay() override;
-
 	void AddMappingContextForCharacter();
 
 private:
@@ -65,7 +66,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Base Character Data")
 	UBaseCharacterData* BaseCharacterData;
 
-	/* Trace Hit */
 
-	TArray< AActor* > HittedActors;
 };

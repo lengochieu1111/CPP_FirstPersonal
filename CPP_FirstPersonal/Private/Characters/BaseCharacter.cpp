@@ -9,8 +9,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-
 #include "DataAsset/BaseCharacterData.h"
 #include "DataAsset/EnhancedInputData.h"
 
@@ -19,7 +17,7 @@
 
 ABaseCharacter::ABaseCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	/* Sprint Arm Component */
 	this->SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm Component"));
@@ -68,66 +66,6 @@ void ABaseCharacter::PostInitializeComponents()
 
 	if (this->AttackComponent && this->BaseCharacterData)
 		this->AttackComponent->SetupAttackComponent(this->BaseCharacterData);
-}
-
-void ABaseCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (this->BaseCharacterData == nullptr) return;
-
-	FVector TraceStart = GetMesh()->GetSocketLocation(this->BaseCharacterData->TraceStart);
-	FVector TraceEnd = GetMesh()->GetSocketLocation(this->BaseCharacterData->TraceEnd);
-
-	TArray<FHitResult> HitResults;
-	int HitCount = 0;
-
-	this->HittedActors.Empty();
-
-	bool bDoHitSomeThing = UKismetSystemLibrary::SphereTraceMultiForObjects(
-		this,
-		TraceStart,
-		TraceEnd,
-		this->BaseCharacterData->TraceRadius,
-		this->BaseCharacterData->TraceObjectTypes,
-		false,
-		this->BaseCharacterData->ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
-		HitResults,
-		true,
-		FLinearColor::Red,
-		FLinearColor::Green,
-		this->BaseCharacterData->DrawTime
-	);
-
-	if (bDoHitSomeThing == false) return;
-
-	for (const FHitResult& Result : HitResults)
-	{
-		if (this->HittedActors.Contains(Result.GetActor())) continue;
-
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				1.0f,
-				FColor::Red,
-				Result.BoneName.ToString()
-			);
-
-		HitCount++;
-		this->HittedActors.Emplace(Result.GetActor());
-	}
-
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			1.0f,
-			FColor::Cyan,
-			FString::Printf(TEXT("Hit Count = %d"), HitCount)
-		);
-
-
-
 }
 
 void ABaseCharacter::BeginPlay()
@@ -192,5 +130,24 @@ void ABaseCharacter::I_PlayAnimMontage(UAnimMontage* AttackMontage)
 void ABaseCharacter::I_AN_EndAttack()
 {
 	this->AttackComponent->AN_EndAttack();
+}
+
+FVector ABaseCharacter::I_GetSocketLocation(const FName& SocketName)
+{
+	return (GetMesh() == nullptr) ? FVector() : GetMesh()->GetSocketLocation(SocketName);
+}
+
+void ABaseCharacter::I_ANS_BeginTraceHit()
+{
+	if (this->AttackComponent == nullptr) return;
+
+	this->AttackComponent->SetupTraceHit();
+}
+
+void ABaseCharacter::I_ANS_TraceHit()
+{
+	if (this->AttackComponent == nullptr) return;
+
+	this->AttackComponent->TraceHit();
 }
 
