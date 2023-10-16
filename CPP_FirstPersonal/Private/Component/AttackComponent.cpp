@@ -85,13 +85,7 @@ void UAttackComponent::TraceHit()
 	{
 		if (this->HittedActors.Contains(Result.GetActor())) continue;
 
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(
-				-1,
-				1.0f,
-				FColor::Red,
-				Result.BoneName.ToString()
-			);
+		HandleHitResult(Result);
 
 		this->HitCount++;
 		this->HittedActors.Emplace(Result.GetActor());
@@ -105,6 +99,20 @@ void UAttackComponent::TraceHit()
 			FString::Printf(TEXT("Hit Count = %d"), HitCount)
 		);
 
+}
+
+void UAttackComponent::HandleHitResult(const FHitResult& Result)
+{
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Red,
+			Result.BoneName.ToString()
+		);
+
+	if (this->HitSomeThingDelegate.IsBound())
+		this->HitSomeThingDelegate.Execute(Result);
 }
 
 

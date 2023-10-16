@@ -35,4 +35,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	float DrawTime = 2.0f;
 
+	/* Stats */
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	float Damage = 20.0f;
 };

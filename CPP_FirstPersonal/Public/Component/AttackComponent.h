@@ -5,6 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "AttackComponent.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FHitSomeThingDelegate, const FHitResult&, HitResult);
 
 class UAnimMontage;
 class UBaseCharacterData;
@@ -24,11 +25,16 @@ public:
 	void SetupTraceHit();
 	void TraceHit();
 
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	void Attack();
+	void HandleHitResult(const FHitResult& Result);
+
+public:
+	FHitSomeThingDelegate HitSomeThingDelegate;
 
 private:
 	UPROPERTY()

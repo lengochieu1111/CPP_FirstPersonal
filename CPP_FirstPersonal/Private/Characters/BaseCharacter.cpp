@@ -14,6 +14,9 @@
 
 #include "Component/AttackComponent.h"
 
+#include "Kismet/GameplayStatics.h" 
+#include "Kismet/KismetMathLibrary.h"
+
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -65,12 +68,17 @@ void ABaseCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	if (this->AttackComponent && this->BaseCharacterData)
+	{
+		this->AttackComponent->HitSomeThingDelegate.BindDynamic(this, &ABaseCharacter::HandleHitSomeThing);
 		this->AttackComponent->SetupAttackComponent(this->BaseCharacterData);
+	}
 }
 
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OnTakePointDamage.AddDynamic(this, &ABaseCharacter::HandleTakePointDamage);
 
 }
 
@@ -120,6 +128,43 @@ void ABaseCharacter::AttackPressed()
 {
 	if (this->AttackComponent)
 		this->AttackComponent->RequestAttack();
+}
+
+void ABaseCharacter::HandleHitSomeThing(const FHitResult& HitResult)
+{
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Red,
+			FString::Printf(TEXT("Hit Some Thing"))
+			);
+
+	AActor* HitActor = HitResult.GetActor();
+	
+	const FVector AttackDirection = UKismetMathLibrary::GetDirectionUnitVector(GetActorLocation(), HitActor->GetActorLocation());
+	
+	UGameplayStatics::ApplyPointDamage(
+		HitActor,
+		this->BaseCharacterData->Damage,
+		AttackDirection,
+		HitResult,
+		GetController(),
+		this,
+		UDamageType::StaticClass()
+	);
+
+}
+
+void ABaseCharacter::HandleTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
+{
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(
+			-1,
+			1.0f,
+			FColor::Red,
+			FString::Printf(TEXT("Take Point Damage"))
+		);
 }
 
 void ABaseCharacter::I_PlayAnimMontage(UAnimMontage* AttackMontage)

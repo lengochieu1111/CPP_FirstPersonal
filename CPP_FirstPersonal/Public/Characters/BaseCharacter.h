@@ -49,6 +49,15 @@ private:
 	void Move(const FInputActionValue& Value);
 	void AttackPressed();
 
+	UFUNCTION()
+	void HandleHitSomeThing(const FHitResult& HitResult);
+
+	UFUNCTION()
+	void HandleTakePointDamage(AActor* DamagedActor, float Damage,
+		class AController* InstigatedBy, FVector HitLocation, 
+		class UPrimitiveComponent* FHitComponent, FName BoneName, 
+		FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+
 /* PROPERTY */
 private:
 	UPROPERTY(VisibleAnywhere)
