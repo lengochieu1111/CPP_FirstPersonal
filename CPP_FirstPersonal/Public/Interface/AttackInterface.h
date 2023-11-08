@@ -23,6 +23,7 @@ public:
 	virtual FVector I_GetSocketLocation(const FName& SocketName) = 0;
 	virtual void I_ANS_BeginTraceHit() = 0;
 	virtual void I_ANS_TraceHit() = 0;
+	virtual void I_AN_Combo() = 0;
 	
 
 };

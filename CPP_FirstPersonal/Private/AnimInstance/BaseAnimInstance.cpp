@@ -19,4 +19,6 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	this->bShouldMove = this->GroundSpeed > 0;
 
+	this->bShouldBlendLowerUpper = this->bShouldMove;
+
 }

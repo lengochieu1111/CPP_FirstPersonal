@@ -14,9 +14,21 @@ class CPP_FIRSTPERSONAL_API UBaseCharacterData : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	UAnimMontage* AttackMontage;
+	TArray<UAnimMontage*> AttackMontages;
 
-	/* Trace Hit*/
+	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
+	UAnimMontage* HitReactMontage_Front;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
+	UAnimMontage* HitReactMontage_Back;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
+	UAnimMontage* HitReactMontage_Left;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
+	UAnimMontage* HitReactMontage_Right;
+
+	/* Trace Hit */
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	TArray< TEnumAsByte< EObjectTypeQuery > > TraceObjectTypes;
 
@@ -34,6 +46,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	float DrawTime = 2.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
+	bool bDrawDebugTrace = false;
+
 
 	/* Stats */
 	UPROPERTY(EditDefaultsOnly, Category = "Stats")

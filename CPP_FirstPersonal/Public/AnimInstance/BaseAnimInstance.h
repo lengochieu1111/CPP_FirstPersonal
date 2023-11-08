@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldMove = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldBlendLowerUpper = true;
+
 private:
 	UPROPERTY()
 	ACharacter* Character;

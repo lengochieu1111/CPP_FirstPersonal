@@ -60,7 +60,6 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(this->EnhancedInputData->IA_Attack, ETriggerEvent::Started, this, &ABaseCharacter::AttackPressed);
 	}
 
-
 }
 
 void ABaseCharacter::PostInitializeComponents()
@@ -132,14 +131,6 @@ void ABaseCharacter::AttackPressed()
 
 void ABaseCharacter::HandleHitSomeThing(const FHitResult& HitResult)
 {
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			1.0f,
-			FColor::Red,
-			FString::Printf(TEXT("Hit Some Thing"))
-			);
-
 	AActor* HitActor = HitResult.GetActor();
 	
 	const FVector AttackDirection = UKismetMathLibrary::GetDirectionUnitVector(GetActorLocation(), HitActor->GetActorLocation());
@@ -165,6 +156,38 @@ void ABaseCharacter::HandleTakePointDamage(AActor* DamagedActor, float Damage, A
 			FColor::Red,
 			FString::Printf(TEXT("Take Point Damage"))
 		);
+
+	if (this->BaseCharacterData)
+	{
+		UAnimMontage* HitReactMontage = GetCorrectHitReactMontage(ShotFromDirection);
+		if (HitReactMontage)
+			PlayAnimMontage(HitReactMontage);
+	}
+
+}
+
+UAnimMontage* ABaseCharacter::GetCorrectHitReactMontage(const FVector& AttackDirection) const
+{
+	if (this->BaseCharacterData == nullptr) return nullptr;
+
+	double Dot = FVector::DotProduct(AttackDirection, GetActorForwardVector());
+
+	if (FMath::Abs(Dot) > 0.5)
+	{
+		if (Dot > 0)
+			return this->BaseCharacterData->HitReactMontage_Back;
+		else
+			return this->BaseCharacterData->HitReactMontage_Front;
+	}
+	else
+	{
+		FVector Cross = FVector::CrossProduct(AttackDirection, GetActorForwardVector());
+		if (Cross.Z > 0)
+			return this->BaseCharacterData->HitReactMontage_Right;
+		else
+			return this->BaseCharacterData->HitReactMontage_Left;
+	}
+
 }
 
 void ABaseCharacter::I_PlayAnimMontage(UAnimMontage* AttackMontage)
@@ -194,5 +217,12 @@ void ABaseCharacter::I_ANS_TraceHit()
 	if (this->AttackComponent == nullptr) return;
 
 	this->AttackComponent->TraceHit();
+}
+
+void ABaseCharacter::I_AN_Combo()
+{
+	if (this->AttackComponent == nullptr) return;
+
+	this->AttackComponent->AN_Combo();
 }
 

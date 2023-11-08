@@ -24,6 +24,7 @@ public:
 	void AN_EndAttack();
 	void SetupTraceHit();
 	void TraceHit();
+	void AN_Combo();
 
 
 protected:
@@ -32,6 +33,7 @@ protected:
 private:
 	void Attack();
 	void HandleHitResult(const FHitResult& Result);
+	UAnimMontage* GetCorrectAttackMontage();
 
 public:
 	FHitSomeThingDelegate HitSomeThingDelegate;
@@ -44,6 +46,9 @@ private:
 	UBaseCharacterData* BaseCharacterData;
 
 	bool bIsAttacking = false;
+	bool bCanCombo = false;
+	bool bSavedAttack = false;
+	int AttackIndex = 0;
 
 	/* Trace Hit */
 	int HitCount = 0;

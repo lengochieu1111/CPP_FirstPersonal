@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/AttackInterface.h"
+#include "Enum/CombatState.h"
 #include "BaseCharacter.generated.h"
 
 
@@ -37,14 +38,15 @@ public:
 	virtual FVector I_GetSocketLocation(const FName& SocketName) override;
 	virtual void I_ANS_BeginTraceHit() override;
 	virtual void I_ANS_TraceHit() override;
+	virtual void I_AN_Combo() override;
 
 		#pragma endregion
 
 protected:
 	virtual void BeginPlay() override;
-	void AddMappingContextForCharacter();
 
 private:
+	void AddMappingContextForCharacter();
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void AttackPressed();
@@ -57,6 +59,9 @@ private:
 		class AController* InstigatedBy, FVector HitLocation, 
 		class UPrimitiveComponent* FHitComponent, FName BoneName, 
 		FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+
+	UAnimMontage* GetCorrectHitReactMontage(const FVector& AttackDirection) const; 
+
 
 /* PROPERTY */
 private:
@@ -75,5 +80,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Base Character Data")
 	UBaseCharacterData* BaseCharacterData;
 
+	ECombatState CombatState = ECombatState::Ready;
+
+/* Setter Getter */
+public:
+	FORCEINLINE ECombatState GetCombatState() const { return this->CombatState; }
 
 };

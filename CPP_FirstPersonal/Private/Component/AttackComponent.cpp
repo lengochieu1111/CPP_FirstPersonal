@@ -29,22 +29,34 @@ void UAttackComponent::SetupAttackComponent(UBaseCharacterData* CharacterData)
 
 void UAttackComponent::RequestAttack()
 {
-	if (this->bIsAttacking) return;
+	bool bCanAttack = this->bCanCombo || this->bIsAttacking == false;
 
-	Attack();
+	if (bCanAttack)
+		Attack();
+	else
+		this->bSavedAttack = true;
+
 }
 
 void UAttackComponent::Attack()
 {
-	if (this->AttackInterface && this->BaseCharacterData)
-		this->AttackInterface->I_PlayAnimMontage(this->BaseCharacterData->AttackMontage);
-
-	this->bIsAttacking = true;
+	if (this->AttackInterface && this->BaseCharacterData) 
+	{
+		UAnimMontage* AttackMontage = GetCorrectAttackMontage();
+		if (AttackMontage)
+		{
+			this->AttackInterface->I_PlayAnimMontage(AttackMontage);
+			this->bIsAttacking = true;
+			this->AttackIndex = (this->AttackIndex + 1) % this->BaseCharacterData->AttackMontages.Num();
+		}
+	}
 }
 
 void UAttackComponent::AN_EndAttack()
 {
 	this->bIsAttacking = false;
+	this->bCanCombo = false;
+	this->AttackIndex = 0;
 }
 
 void UAttackComponent::SetupTraceHit()
@@ -71,7 +83,7 @@ void UAttackComponent::TraceHit()
 		this->BaseCharacterData->TraceObjectTypes,
 		false,
 		this->BaseCharacterData->ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		this->BaseCharacterData->bDrawDebugTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None,
 		HitResults,
 		true,
 		FLinearColor::Red,
@@ -101,6 +113,17 @@ void UAttackComponent::TraceHit()
 
 }
 
+void UAttackComponent::AN_Combo()
+{
+	this->bCanCombo = true;
+
+	if (this->bSavedAttack)
+	{
+		RequestAttack();
+		this->bSavedAttack = false;
+	}
+}
+
 void UAttackComponent::HandleHitResult(const FHitResult& Result)
 {
 	if (GEngine)
@@ -113,6 +136,14 @@ void UAttackComponent::HandleHitResult(const FHitResult& Result)
 
 	if (this->HitSomeThingDelegate.IsBound())
 		this->HitSomeThingDelegate.Execute(Result);
+}
+
+UAnimMontage* UAttackComponent::GetCorrectAttackMontage()
+{
+	if (this->BaseCharacterData == nullptr) return nullptr;
+	if (this->BaseCharacterData->AttackMontages.IsEmpty()) return nullptr;
+
+	return this->BaseCharacterData->AttackMontages[this->AttackIndex];
 }
 
 
