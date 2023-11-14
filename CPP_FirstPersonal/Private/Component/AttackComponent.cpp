@@ -40,13 +40,15 @@ void UAttackComponent::RequestAttack()
 
 void UAttackComponent::Attack()
 {
+	if (this->BaseCharacterData->AttackMontages.IsEmpty()) return;
+
 	if (this->AttackInterface && this->BaseCharacterData) 
 	{
 		UAnimMontage* AttackMontage = GetCorrectAttackMontage();
 		if (AttackMontage)
 		{
-			this->AttackInterface->I_PlayAnimMontage(AttackMontage);
 			this->bIsAttacking = true;
+			this->AttackInterface->I_PlayAnimMontage(AttackMontage);
 			this->AttackIndex = (this->AttackIndex + 1) % this->BaseCharacterData->AttackMontages.Num();
 		}
 	}

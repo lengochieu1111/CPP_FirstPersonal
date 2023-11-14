@@ -6,6 +6,7 @@
 #include "BaseCharacterData.generated.h"
 
 class UAnimMontage;
+class UParticleSystem;
 
 UCLASS()
 class CPP_FIRSTPERSONAL_API UBaseCharacterData : public UDataAsset
@@ -50,6 +51,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	bool bDrawDebugTrace = false;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Hit Impact")
+	UParticleSystem* HitImpactEffect;
 
 	/* Stats */
 	UPROPERTY(EditDefaultsOnly, Category = "Stats")

@@ -164,6 +164,12 @@ void ABaseCharacter::HandleTakePointDamage(AActor* DamagedActor, float Damage, A
 			PlayAnimMontage(HitReactMontage);
 	}
 
+	UGameplayStatics::SpawnEmitterAtLocation(
+		GetWorld(),
+		this->BaseCharacterData->HitImpactEffect,
+		HitLocation
+	);
+
 }
 
 UAnimMontage* ABaseCharacter::GetCorrectHitReactMontage(const FVector& AttackDirection) const
