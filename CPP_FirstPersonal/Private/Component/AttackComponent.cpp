@@ -44,13 +44,12 @@ void UAttackComponent::Attack()
 
 	if (this->AttackInterface && this->BaseCharacterData) 
 	{
-		UAnimMontage* AttackMontage = GetCorrectAttackMontage();
-		if (AttackMontage)
-		{
-			this->bIsAttacking = true;
-			this->AttackInterface->I_PlayAnimMontage(AttackMontage);
-			this->AttackIndex = (this->AttackIndex + 1) % this->BaseCharacterData->AttackMontages.Num();
-		}
+		this->AttackInterface->I_PlayAnimMontage(GetCorrectAttackMontage());
+		this->AttackInterface->I_PlayStartAttackSound();
+
+		this->bIsAttacking = true;
+		this->bCanCombo = false;
+		this->AttackIndex = (this->AttackIndex + 1) % this->BaseCharacterData->AttackMontages.Num();
 	}
 }
 

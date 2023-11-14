@@ -149,25 +149,31 @@ void ABaseCharacter::HandleHitSomeThing(const FHitResult& HitResult)
 
 void ABaseCharacter::HandleTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
 {
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			1.0f,
-			FColor::Red,
-			FString::Printf(TEXT("Take Point Damage"))
-		);
+	if (this->BaseCharacterData == nullptr) return;
 
-	if (this->BaseCharacterData)
-	{
-		UAnimMontage* HitReactMontage = GetCorrectHitReactMontage(ShotFromDirection);
-		if (HitReactMontage)
-			PlayAnimMontage(HitReactMontage);
-	}
+	UAnimMontage* HitReactMontage = GetCorrectHitReactMontage(ShotFromDirection);
+	if (HitReactMontage)
+		PlayAnimMontage(HitReactMontage);
 
+	// Play Hit Impact Effect
 	UGameplayStatics::SpawnEmitterAtLocation(
 		GetWorld(),
 		this->BaseCharacterData->HitImpactEffect,
 		HitLocation
+	);
+
+	// Play Impact Sound
+	UGameplayStatics::PlaySoundAtLocation(
+		GetWorld(),
+		this->BaseCharacterData->HitImpactSound,
+		HitLocation
+	);
+
+	// Play Pain Sound
+	UGameplayStatics::PlaySoundAtLocation(
+		GetWorld(),
+		this->BaseCharacterData->PainSound,
+		GetActorLocation()
 	);
 
 }
@@ -199,6 +205,17 @@ UAnimMontage* ABaseCharacter::GetCorrectHitReactMontage(const FVector& AttackDir
 void ABaseCharacter::I_PlayAnimMontage(UAnimMontage* AttackMontage)
 {
 	PlayAnimMontage(AttackMontage);
+}
+
+void ABaseCharacter::I_PlayStartAttackSound()
+{
+	if (this->BaseCharacterData == nullptr) return;
+
+	UGameplayStatics::PlaySoundAtLocation(
+		GetWorld(),
+		this->BaseCharacterData->StartAttackSound,
+		GetActorLocation()
+	);
 }
 
 void ABaseCharacter::I_AN_EndAttack()

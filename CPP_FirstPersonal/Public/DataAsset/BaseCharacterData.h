@@ -14,9 +14,18 @@ class CPP_FIRSTPERSONAL_API UBaseCharacterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	/* 
+	* Trace Hit 
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	TArray<UAnimMontage*> AttackMontages;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	USoundBase* StartAttackSound;
+
+	/*
+	* Hit React
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
 	UAnimMontage* HitReactMontage_Front;
 
@@ -29,7 +38,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Hit React")
 	UAnimMontage* HitReactMontage_Right;
 
-	/* Trace Hit */
+	/*
+	* Trace Hit 
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	TArray< TEnumAsByte< EObjectTypeQuery > > TraceObjectTypes;
 
@@ -51,10 +62,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Trace Hit")
 	bool bDrawDebugTrace = false;
 
+	/* 
+	* Hit Impact
+	*/
 	UPROPERTY(EditDefaultsOnly, Category = "Hit Impact")
 	UParticleSystem* HitImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hit Impact")
+	USoundBase* HitImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hit Impact")
+	USoundBase* PainSound;
 
 	/* Stats */
 	UPROPERTY(EditDefaultsOnly, Category = "Stats")
 	float Damage = 20.0f;
+
 };

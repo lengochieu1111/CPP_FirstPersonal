@@ -34,7 +34,9 @@ public:
 		#pragma region Attack_Interface
 
 	virtual void I_PlayAnimMontage(UAnimMontage* AttackMontage) override;
+	virtual void I_PlayStartAttackSound() override;
 	virtual void I_AN_EndAttack() override;
+
 	virtual FVector I_GetSocketLocation(const FName& SocketName) override;
 	virtual void I_ANS_BeginTraceHit() override;
 	virtual void I_ANS_TraceHit() override;

@@ -19,7 +19,9 @@ class CPP_FIRSTPERSONAL_API IAttackInterface
 
 public:
 	virtual void I_PlayAnimMontage(UAnimMontage* AttackMontage) = 0;
+	virtual void I_PlayStartAttackSound() = 0;
 	virtual void I_AN_EndAttack() = 0;
+
 	virtual FVector I_GetSocketLocation(const FName& SocketName) = 0;
 	virtual void I_ANS_BeginTraceHit() = 0;
 	virtual void I_ANS_TraceHit() = 0;
