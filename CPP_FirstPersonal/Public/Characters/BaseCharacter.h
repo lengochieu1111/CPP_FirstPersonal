@@ -13,6 +13,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 class UAttackComponent;
+class UHealthComponent;
 
 class UEnhancedInputData;
 struct FInputActionValue;
@@ -73,9 +74,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
 
-	UPROPERTY(VisibleAnywhere)
-	UAttackComponent* AttackComponent;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input Data")
 	UEnhancedInputData* EnhancedInputData;
 
@@ -83,6 +81,13 @@ private:
 	UBaseCharacterData* BaseCharacterData;
 
 	ECombatState CombatState = ECombatState::Ready;
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	UAttackComponent* AttackComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UHealthComponent* HealthComponent;
 
 /* Setter Getter */
 public:

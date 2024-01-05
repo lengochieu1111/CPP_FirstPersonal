@@ -13,6 +13,7 @@
 #include "DataAsset/EnhancedInputData.h"
 
 #include "Component/AttackComponent.h"
+#include "Component/HealthComponent.h"
 
 #include "Kismet/GameplayStatics.h" 
 #include "Kismet/KismetMathLibrary.h"
@@ -36,6 +37,9 @@ ABaseCharacter::ABaseCharacter()
 
 	/* Attack Component */
 	this->AttackComponent = CreateDefaultSubobject<UAttackComponent>(TEXT("Attack Component"));
+
+	/* Health Component*/
+	this->HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 	//
 	bUseControllerRotationYaw = false;
@@ -66,10 +70,17 @@ void ABaseCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (this->AttackComponent && this->BaseCharacterData)
+	if (!this->BaseCharacterData) return;
+
+	if (this->AttackComponent)
 	{
 		this->AttackComponent->HitSomeThingDelegate.BindDynamic(this, &ABaseCharacter::HandleHitSomeThing);
 		this->AttackComponent->SetupAttackComponent(this->BaseCharacterData);
+	}	
+
+	if (this->HealthComponent)
+	{
+		this->HealthComponent->SetupHealthComponent(this->BaseCharacterData);
 	}
 }
 
